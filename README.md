@@ -3,7 +3,7 @@
 
   # hylix
 
-  Hyprland configuration framework built on Nix modules.
+  Hyprland configuration framework.
 
   [![Nix](https://img.shields.io/badge/Nix-flakes-689d6a?style=flat-square&labelColor=504945&logo=nixos&logoColor=ebdbb2)](https://nixos.wiki/wiki/Flakes)
   [![Hyprland](https://img.shields.io/badge/Hyprland-Lua%20config-458588?style=flat-square&labelColor=504945&color=458588)](https://hyprland.org)

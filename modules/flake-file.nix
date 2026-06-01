@@ -2,7 +2,7 @@
   imports = [inputs.flake-file.flakeModules.default];
 
   flake-file = {
-    description = "Hyprland configuration framework built on Nix modules";
+    description = "Hyprland configuration framework";
     outputs = ''
       inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules)
     '';
