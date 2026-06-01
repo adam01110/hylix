@@ -15,12 +15,21 @@ _: {
       mkOrder
       # keep-sorted end
       ;
-    inherit (lib.self) ordering;
+    inherit
+      (lib.self)
+      # keep-sorted start
+      ordering
+      toLua
+      # keep-sorted end
+      ;
     inherit
       (lib.types)
       # keep-sorted start
+      anything
       listOf
+      nullOr
       str
+      submodule
       # keep-sorted end
       ;
 
@@ -28,12 +37,35 @@ _: {
 
     lines =
       concatStringsSep "\n"
-      (map (cmd: "hl.exec_cmd(\"${cmd}\")") cfg.autostart);
+      (map (
+          entry:
+            if entry.rules != null
+            then "hl.exec_cmd(${toLua entry.cmd}, ${toLua entry.rules})"
+            else "hl.exec_cmd(${toLua entry.cmd})"
+        )
+        cfg.autostart);
   in {
     options.programs.hylix.autostart = mkOption {
       description = "commands to run at startup via hl.exec_cmd()";
 
-      type = listOf str;
+      type = listOf (submodule {
+        options = {
+          # keep-sorted start block=yes newline_separated=yes
+          cmd = mkOption {
+            description = "the command to run";
+
+            type = str;
+          };
+
+          rules = mkOption {
+            description = "optional Hyprland rules table";
+
+            type = nullOr anything;
+            default = null;
+          };
+          # keep-sorted end
+        };
+      });
       default = [];
     };
 

@@ -1,5 +1,12 @@
 {lib}: let
   inherit
+    (builtins)
+    # keep-sorted start
+    isString
+    fromJSON
+    # keep-sorted end
+    ;
+  inherit
     (lib)
     # keep-sorted start
     concatMap
@@ -35,7 +42,12 @@ in rec {
 
   mkHylixDispatcher = toLua: bind:
     if bind.exec != null
-    then "hl.dsp.exec_cmd(${toLua bind.exec})"
+    then
+      if bind.execRules != null
+      then "hl.dsp.exec_cmd(${toLua bind.exec}, ${toLua bind.execRules})"
+      else "hl.dsp.exec_cmd(${toLua bind.exec})"
+    else if bind.execRaw != null
+    then "hl.dsp.exec_raw(${toLua bind.execRaw})"
     else if bind.lua != null
     then bind.lua
     else if bind.action != null
@@ -98,11 +110,15 @@ in rec {
     bindGroups;
 
   mkHylixMonitorLine = toLua: monitor: let
+    scaleVal =
+      if monitor.scale != null && isString monitor.scale
+      then fromJSON monitor.scale
+      else monitor.scale;
     base =
       {inherit (monitor) output;}
       // optionalAttrs (monitor.mode != null) {inherit (monitor) mode;}
       // optionalAttrs (monitor.position != null) {inherit (monitor) position;}
-      // optionalAttrs (monitor.scale != null) {inherit (monitor) scale;};
+      // optionalAttrs (scaleVal != null) {scale = scaleVal;};
   in "hl.monitor(${toLua (base // monitor.extra)})";
 
   mkHylixRuleLine = toLua: func: rule: "${func}(${toLua rule})";

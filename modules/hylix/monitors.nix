@@ -27,6 +27,9 @@ _: {
       (lib.types)
       # keep-sorted start
       anything
+      either
+      float
+      int
       listOf
       nullOr
       str
@@ -69,9 +72,9 @@ _: {
         };
 
         scale = mkOption {
-          description = "scale factor (string, e.g. \"1\" or \"1.5\")";
+          description = "scale factor (number or string, e.g. 1 or \"1.5\")";
 
-          type = nullOr str;
+          type = nullOr (either str (either int float));
           default = null;
         };
         # keep-sorted end

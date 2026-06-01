@@ -80,6 +80,20 @@
           default = null;
         };
 
+        execRaw = mkOption {
+          description = "command to execute via hl.dsp.exec_raw";
+
+          type = nullOr str;
+          default = null;
+        };
+
+        execRules = mkOption {
+          description = "hyprland dispatcher rules for the exec command (e.g. {float = true; move = {0, 0;}})";
+
+          type = nullOr anything;
+          default = null;
+        };
+
         keys = mkOption {
           description = "key combination (e.g. [\"SUPER\" \"q\"])";
 
