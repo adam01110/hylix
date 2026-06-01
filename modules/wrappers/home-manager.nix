@@ -15,7 +15,7 @@
       ;
 
     cfg = config.programs.hylix;
-    hyprlandEnabled = config.wayland.windowManager.hyprland;
+    hyprlandEnabled = config.wayland.windowManager.hyprland.enable;
   in {
     options.programs.hylix.enable = mkEnableOption "hylix hyprland lua config generator";
 
