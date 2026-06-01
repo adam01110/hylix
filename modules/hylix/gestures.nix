@@ -15,7 +15,7 @@ _: {
       mkOrder
       # keep-sorted end
       ;
-    inherit (lib.self) toLua ordering;
+    inherit (import ../../lib {inherit lib;}) toLua ordering;
     inherit
       (lib.types)
       # keep-sorted start

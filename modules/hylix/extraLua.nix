@@ -15,7 +15,7 @@ _: {
       mkOrder
       # keep-sorted end
       ;
-    inherit (lib.self) ordering;
+    inherit (import ../../lib {inherit lib;}) ordering;
     inherit
       (lib.types)
       # keep-sorted start

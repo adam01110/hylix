@@ -17,7 +17,7 @@ _: {
       # keep-sorted end
       ;
     inherit
-      (lib.self)
+      (import ../../lib {inherit lib;})
       # keep-sorted start
       mkHylixRuleLine
       ordering
