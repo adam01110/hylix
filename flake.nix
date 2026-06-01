@@ -1,4 +1,6 @@
 {
+  description = "Hyprland configuration framework";
+
   inputs = {
     # keep-sorted start block=yes newline_separated=yes
     flake-parts = {
