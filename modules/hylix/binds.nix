@@ -123,7 +123,7 @@
         binds = mkOption {
           description = "keybindings in this group";
 
-          type = listOf (bindType lib);
+          type = listOf bindType;
           default = [];
         };
 
@@ -139,14 +139,14 @@
     options.programs.hylix.binds = mkOption {
       description = "keybindings";
 
-      type = listOf (bindType lib);
+      type = listOf bindType;
       default = [];
     };
 
     options.programs.hylix.bindGroups = mkOption {
       description = "grouped keybindings";
 
-      type = listOf (bindGroupType lib);
+      type = listOf bindGroupType;
       default = [];
     };
 
