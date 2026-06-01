@@ -2,8 +2,8 @@
   inherit
     (builtins)
     # keep-sorted start
-    isString
     fromJSON
+    isString
     # keep-sorted end
     ;
   inherit
