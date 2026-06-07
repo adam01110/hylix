@@ -2,7 +2,9 @@
   inherit
     (builtins)
     # keep-sorted start
+    filter
     fromJSON
+    hasAttr
     isString
     # keep-sorted end
     ;
@@ -15,10 +17,26 @@
     foldl'
     mapAttrsToList
     optionalAttrs
+    replaceStrings
     # keep-sorted end
     ;
 
   cleanAttrs = filterAttrs (_: value: value != null);
+
+  sanitizeCurveName = replaceStrings [":" "/" " " "-" "."] ["_" "_" "_" "_" "_"];
+
+  mkDerivedSpringName = anim: "hylix_${sanitizeCurveName anim.leaf}_${sanitizeCurveName anim.spring}";
+
+  scaleSpringForSpeed = speed: curve: let
+    timeScale = speed / 10.0;
+  in
+    curve
+    // optionalAttrs ((curve.stiffness or null) != null) {
+      stiffness = curve.stiffness / (timeScale * timeScale);
+    }
+    // optionalAttrs ((curve.dampening or null) != null) {
+      dampening = curve.dampening / timeScale;
+    };
 in rec {
   mkHylixBind = description: keys: dispatcher:
     {
@@ -151,18 +169,50 @@ in rec {
         };
   in "hl.curve(\"${name}\", ${toLua table})";
 
-  mkHylixAnimationLine = toLua: anim: let
+  mkHylixAnimationLineWithCurves = toLua: curves: anim: let
+    bezier = anim.bezier or null;
+    speed = anim.speed or null;
+    canScaleSpring = (anim.spring or null) != null && speed != null && speed > 0 && hasAttr anim.spring curves;
+    spring =
+      if canScaleSpring
+      then mkDerivedSpringName anim
+      else anim.spring or null;
+    style = anim.style or null;
     table =
       {inherit (anim) leaf enabled;}
-      // optionalAttrs (anim.speed != null) {inherit (anim) speed;}
-      // optionalAttrs (anim.bezier != null) {inherit (anim) bezier;}
-      // optionalAttrs (anim.spring != null) {inherit (anim) spring;}
-      // optionalAttrs (anim.style != null) {inherit (anim) style;};
+      // optionalAttrs (speed != null) {inherit speed;}
+      // optionalAttrs (bezier != null) {inherit bezier;}
+      // optionalAttrs (spring != null) {inherit spring;}
+      // optionalAttrs (style != null) {inherit style;};
   in "hl.animation(${toLua table})";
+
+  mkHylixAnimationLine = toLua: anim:
+    mkHylixAnimationLineWithCurves toLua {} anim;
+
+  mkHylixDerivedSpringLine = toLua: curves: anim:
+    if
+      (anim.spring or null)
+      != null
+      && (anim.speed or null) != null
+      && anim.speed > 0
+      && hasAttr anim.spring curves
+    then let
+      curve = curves.${anim.spring};
+    in
+      if curve.type == "spring"
+      then mkHylixCurveLine toLua (mkDerivedSpringName anim) (scaleSpringForSpeed anim.speed curve)
+      else null
+    else null;
 
   mkHylixCurveLines = toLua: curves:
     concatStringsSep "\n" (mapAttrsToList (mkHylixCurveLine toLua) curves);
 
+  mkHylixAnimationLinesWithCurves = toLua: curves: animations:
+    concatStringsSep "\n" (filter (line: line != null) (
+      (map (mkHylixDerivedSpringLine toLua curves) animations)
+      ++ (map (mkHylixAnimationLineWithCurves toLua curves) animations)
+    ));
+
   mkHylixAnimationLines = toLua: animations:
-    concatStringsSep "\n" (map (mkHylixAnimationLine toLua) animations);
+    mkHylixAnimationLinesWithCurves toLua {} animations;
 }

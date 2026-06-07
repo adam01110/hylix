@@ -6,7 +6,9 @@ in {
     (modulesMod)
     # keep-sorted start
     mkHylixAnimationLine
+    mkHylixAnimationLineWithCurves
     mkHylixAnimationLines
+    mkHylixAnimationLinesWithCurves
     mkHylixBind
     mkHylixBindGroup
     mkHylixBindLine

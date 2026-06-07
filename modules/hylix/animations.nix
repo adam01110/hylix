@@ -18,7 +18,7 @@ _: {
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
-      mkHylixAnimationLines
+      mkHylixAnimationLinesWithCurves
       mkHylixCurveLines
       ordering
       toLua
@@ -43,7 +43,7 @@ _: {
     cfg = config.programs.hylix;
 
     curveLines = mkHylixCurveLines toLua cfg.animations.curves;
-    animLines = mkHylixAnimationLines toLua cfg.animations.animations;
+    animLines = mkHylixAnimationLinesWithCurves toLua cfg.animations.curves cfg.animations.animations;
 
     curveType = submodule {
       options = {
