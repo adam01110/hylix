@@ -6,14 +6,21 @@
     filterAttrs
     mkIf
     mkOrder
+    optionalString
     # keep-sorted end
     ;
 in rec {
   cleanAttrs = filterAttrs (_: value: value != null);
 
-  mkHylixGeneratedConfig = condition: order: text:
+  mkHylixLuaSection = name: text:
+    optionalString (text != "") ''
+      -- ${name}
+      ${text}
+    '';
+
+  mkHylixGeneratedConfig = condition: order: name: text:
     mkIf condition {
-      programs.hylix._generatedConfig = mkOrder order text;
+      programs.hylix._generatedConfig = mkOrder order (mkHylixLuaSection name text);
     };
 
   mkHylixLines = lineFn: values:

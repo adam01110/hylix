@@ -39,6 +39,6 @@ _: {
       default = {};
     };
 
-    config = mkHylixGeneratedConfig (cfg.env != {}) ordering.env envLines;
+    config = mkHylixGeneratedConfig (cfg.env != {}) ordering.env "env" envLines;
   };
 }

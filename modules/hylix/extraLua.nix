@@ -53,7 +53,7 @@ _: {
         };
       }
 
-      (mkHylixGeneratedConfig (cfg.extraLua != "") ordering.extraLua cfg.extraLua)
+      (mkHylixGeneratedConfig (cfg.extraLua != "") ordering.extraLua "extraLua" cfg.extraLua)
     ];
   };
 }

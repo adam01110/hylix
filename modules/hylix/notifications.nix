@@ -72,6 +72,6 @@ _: {
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (cfg.notifications != []) ordering.notifications lines;
+    config = mkHylixGeneratedConfig (cfg.notifications != []) ordering.notifications "notifications" lines;
   };
 }

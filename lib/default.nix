@@ -25,6 +25,7 @@ in {
     mkHylixLines
     mkHylixLuaCall
     mkHylixLuaCallLines
+    mkHylixLuaSection
     mkHylixLuaValueCall
     mkHylixMonitorLine
     mkHylixRuleLine

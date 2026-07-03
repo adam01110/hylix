@@ -87,6 +87,6 @@ _: {
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (cfg.monitors != []) ordering.monitors lines;
+    config = mkHylixGeneratedConfig (cfg.monitors != []) ordering.monitors "monitors" lines;
   };
 }

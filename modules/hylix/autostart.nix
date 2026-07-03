@@ -61,6 +61,6 @@ _: {
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (cfg.autostart != []) ordering.autostart lines;
+    config = mkHylixGeneratedConfig (cfg.autostart != []) ordering.autostart "autostart" lines;
   };
 }

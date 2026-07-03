@@ -65,6 +65,6 @@ _: {
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (cfg.events != []) ordering.events lines;
+    config = mkHylixGeneratedConfig (cfg.events != []) ordering.events "events" lines;
   };
 }

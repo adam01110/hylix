@@ -152,9 +152,9 @@ _: {
     };
 
     config = mkMerge [
-      (mkHylixGeneratedConfig (cfg.animations.curves != {}) ordering.curves curveLines)
+      (mkHylixGeneratedConfig (cfg.animations.curves != {}) ordering.curves "animations.curves" curveLines)
 
-      (mkHylixGeneratedConfig (cfg.animations.animations != []) ordering.animations animLines)
+      (mkHylixGeneratedConfig (cfg.animations.animations != []) ordering.animations "animations.animations" animLines)
     ];
   };
 }

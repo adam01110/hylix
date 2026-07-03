@@ -66,6 +66,6 @@ _: {
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (cfg.permissions != []) ordering.permissions lines;
+    config = mkHylixGeneratedConfig (cfg.permissions != []) ordering.permissions "permissions" lines;
   };
 }

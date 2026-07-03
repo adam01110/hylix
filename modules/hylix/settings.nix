@@ -35,6 +35,7 @@ _: {
       mkHylixGeneratedConfig
       (cfg.settings != {})
       ordering.settings
+      "settings"
       (mkHylixLuaValueCall toLua "hl.config" [cfg.settings]);
   };
 }

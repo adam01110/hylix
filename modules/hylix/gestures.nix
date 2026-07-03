@@ -40,6 +40,6 @@ _: {
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (cfg.gestures != []) ordering.gestures lines;
+    config = mkHylixGeneratedConfig (cfg.gestures != []) ordering.gestures "gestures" lines;
   };
 }

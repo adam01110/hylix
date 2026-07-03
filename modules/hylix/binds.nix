@@ -149,6 +149,6 @@
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (allBinds != []) ordering.binds (concatStringsSep "\n" lines);
+    config = mkHylixGeneratedConfig (allBinds != []) ordering.binds "binds" (concatStringsSep "\n" lines);
   };
 }

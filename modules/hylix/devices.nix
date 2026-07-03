@@ -40,6 +40,6 @@ _: {
       default = [];
     };
 
-    config = mkHylixGeneratedConfig (cfg.devices != []) ordering.devices lines;
+    config = mkHylixGeneratedConfig (cfg.devices != []) ordering.devices "devices" lines;
   };
 }
