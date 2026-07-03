@@ -41,6 +41,7 @@ _: {
 
       type = listOf (submodule {
         options = {
+          # keep-sorted start block=yes newline_separated=yes
           event = mkOption {
             description = "hyprland event name (e.g. \"hyprland.start\", \"window.active\", \"workspace.active\")";
 
@@ -60,6 +61,7 @@ _: {
             type = nullOr str;
             default = null;
           };
+          # keep-sorted end
         };
       });
       default = [];

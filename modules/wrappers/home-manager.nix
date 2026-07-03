@@ -27,8 +27,10 @@
 in {
   flake.homeManagerModules.default = {
     imports = [
+      # keep-sorted start
       config.flake.modules.generic.hylix
       hmModule
+      # keep-sorted end
     ];
   };
 }

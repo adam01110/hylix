@@ -1,6 +1,8 @@
 {
+  # keep-sorted start
   config,
   inputs,
+  # keep-sorted end
   ...
 }: {
   perSystem = {system, ...}: let

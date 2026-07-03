@@ -41,6 +41,7 @@ _: {
 
       type = listOf (submodule {
         options = {
+          # keep-sorted start block=yes newline_separated=yes
           group = mkOption {
             description = "notification group for grouping/dedup";
 
@@ -67,6 +68,7 @@ _: {
             type = int;
             default = 5000;
           };
+          # keep-sorted end
         };
       });
       default = [];
