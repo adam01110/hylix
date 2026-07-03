@@ -20,6 +20,7 @@
         # keep-sorted start
         ".direnv/*"
         ".envrc"
+        "assets/hylix-infra-sample.lua"
         "flake.nix"
         # keep-sorted end
       ];
