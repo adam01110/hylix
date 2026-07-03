@@ -9,15 +9,14 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
+      mkHylixGeneratedConfig
+      mkHylixLuaCallLines
       ordering
       toLua
       # keep-sorted end
@@ -35,9 +34,7 @@ _: {
 
     cfg = config.programs.hylix;
 
-    lines =
-      concatStringsSep "\n"
-      (map (n: "hl.notification.create(${toLua n})") cfg.notifications);
+    lines = mkHylixLuaCallLines toLua "hl.notification.create" cfg.notifications;
   in {
     options.programs.hylix.notifications = mkOption {
       description = "notifications sent on startup via hl.notification.create()";
@@ -75,8 +72,6 @@ _: {
       default = [];
     };
 
-    config = mkIf (cfg.notifications != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.notifications lines;
-    };
+    config = mkHylixGeneratedConfig (cfg.notifications != []) ordering.notifications lines;
   };
 }

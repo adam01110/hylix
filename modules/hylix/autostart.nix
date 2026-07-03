@@ -9,15 +9,15 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
+      mkHylixAutostartLine
+      mkHylixGeneratedConfig
+      mkHylixLines
       ordering
       toLua
       # keep-sorted end
@@ -35,15 +35,7 @@ _: {
 
     cfg = config.programs.hylix;
 
-    lines =
-      concatStringsSep "\n"
-      (map (
-          entry:
-            if entry.rules != null
-            then "hl.exec_cmd(${toLua entry.cmd}, ${toLua entry.rules})"
-            else "hl.exec_cmd(${toLua entry.cmd})"
-        )
-        cfg.autostart);
+    lines = mkHylixLines (mkHylixAutostartLine toLua) cfg.autostart;
   in {
     options.programs.hylix.autostart = mkOption {
       description = "commands to run at startup via hl.exec_cmd()";
@@ -69,8 +61,6 @@ _: {
       default = [];
     };
 
-    config = mkIf (cfg.autostart != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.autostart lines;
-    };
+    config = mkHylixGeneratedConfig (cfg.autostart != []) ordering.autostart lines;
   };
 }

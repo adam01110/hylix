@@ -11,11 +11,17 @@ _: {
       # keep-sorted start
       concatStringsSep
       mkIf
+      mkMerge
       mkOption
-      mkOrder
       # keep-sorted end
       ;
-    inherit (import ../../lib {inherit lib;}) ordering;
+    inherit
+      (import ../../lib {inherit lib;})
+      # keep-sorted start
+      mkHylixGeneratedConfig
+      ordering
+      # keep-sorted end
+      ;
     inherit
       (lib.types)
       # keep-sorted start
@@ -40,11 +46,14 @@ _: {
       default = [];
     };
 
-    config = {
-      programs.hylix = {
-        extraLua = mkIf (cfg.extraLuaSnippets != []) (concatStringsSep "\n" cfg.extraLuaSnippets);
-        _generatedConfig = mkIf (cfg.extraLua != "") (mkOrder ordering.extraLua cfg.extraLua);
-      };
-    };
+    config = mkMerge [
+      {
+        programs.hylix = {
+          extraLua = mkIf (cfg.extraLuaSnippets != []) (concatStringsSep "\n" cfg.extraLuaSnippets);
+        };
+      }
+
+      (mkHylixGeneratedConfig (cfg.extraLua != "") ordering.extraLua cfg.extraLua)
+    ];
   };
 }

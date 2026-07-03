@@ -9,14 +9,18 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mapAttrsToList
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
-    inherit (import ../../lib {inherit lib;}) ordering;
+    inherit
+      (import ../../lib {inherit lib;})
+      # keep-sorted start
+      mkHylixEnvLines
+      mkHylixGeneratedConfig
+      ordering
+      toLua
+      # keep-sorted end
+      ;
     inherit
       (lib.types)
       # keep-sorted start
@@ -26,9 +30,7 @@ _: {
       ;
     cfg = config.programs.hylix;
 
-    envLines =
-      concatStringsSep "\n"
-      (mapAttrsToList (k: v: "hl.env(\"${k}\", \"${v}\")") cfg.env);
+    envLines = mkHylixEnvLines toLua cfg.env;
   in {
     options.programs.hylix.env = mkOption {
       description = "environment variables set via hl.env()";
@@ -37,8 +39,6 @@ _: {
       default = {};
     };
 
-    config = mkIf (cfg.env != {}) {
-      programs.hylix._generatedConfig = mkOrder ordering.env envLines;
-    };
+    config = mkHylixGeneratedConfig (cfg.env != {}) ordering.env envLines;
   };
 }

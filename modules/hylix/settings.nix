@@ -9,17 +9,17 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
+      mkHylixGeneratedConfig
+      mkHylixLuaValueCall
       ordering
       toLua
-      #keep-sorted end
+      # keep-sorted end
       ;
     inherit (lib.types) anything;
     cfg = config.programs.hylix;
@@ -31,10 +31,10 @@ _: {
       default = {};
     };
 
-    config = mkIf (cfg.settings != {}) {
-      programs.hylix._generatedConfig =
-        mkOrder ordering.settings
-        "hl.config(${toLua cfg.settings})";
-    };
+    config =
+      mkHylixGeneratedConfig
+      (cfg.settings != {})
+      ordering.settings
+      (mkHylixLuaValueCall toLua "hl.config" [cfg.settings]);
   };
 }

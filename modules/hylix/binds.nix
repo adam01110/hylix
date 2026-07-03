@@ -10,15 +10,14 @@
       (lib)
       # keep-sorted start
       concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
       mkHylixBindLines
+      mkHylixGeneratedConfig
       mkHylixGroupedBinds
       ordering
       toLua
@@ -150,8 +149,6 @@
       default = [];
     };
 
-    config = mkIf (allBinds != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.binds (concatStringsSep "\n" lines);
-    };
+    config = mkHylixGeneratedConfig (allBinds != []) ordering.binds (concatStringsSep "\n" lines);
   };
 }

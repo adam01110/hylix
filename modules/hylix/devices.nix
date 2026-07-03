@@ -9,15 +9,14 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
+      mkHylixGeneratedConfig
+      mkHylixLuaCallLines
       ordering
       toLua
       # keep-sorted end
@@ -32,9 +31,7 @@ _: {
 
     cfg = config.programs.hylix;
 
-    lines =
-      concatStringsSep "\n"
-      (map (d: "hl.device(${toLua d})") cfg.devices);
+    lines = mkHylixLuaCallLines toLua "hl.device" cfg.devices;
   in {
     options.programs.hylix.devices = mkOption {
       description = "device configurations passed to hl.device()";
@@ -43,8 +40,6 @@ _: {
       default = [];
     };
 
-    config = mkIf (cfg.devices != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.devices lines;
-    };
+    config = mkHylixGeneratedConfig (cfg.devices != []) ordering.devices lines;
   };
 }

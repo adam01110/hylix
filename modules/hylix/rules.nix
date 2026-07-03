@@ -9,16 +9,15 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkMerge
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
+      mkHylixGeneratedConfig
+      mkHylixLines
       mkHylixRuleLine
       ordering
       toLua
@@ -34,6 +33,29 @@ _: {
     cfg = config.programs.hylix;
 
     buildRule = mkHylixRuleLine toLua;
+    ruleSections = [
+      {
+        func = "hl.window_rule";
+        order = ordering.windowRules;
+        values = cfg.rules.window;
+      }
+      {
+        func = "hl.workspace_rule";
+        order = ordering.workspaceRules;
+        values = cfg.rules.workspace;
+      }
+      {
+        func = "hl.layer_rule";
+        order = ordering.layerRules;
+        values = cfg.rules.layer;
+      }
+    ];
+    mkRuleSection = {
+      func,
+      order,
+      values,
+    }:
+      mkHylixGeneratedConfig (values != []) order (mkHylixLines (buildRule func) values);
   in {
     options.programs.hylix.rules = {
       # keep-sorted start block=yes newline_separated=yes
@@ -60,24 +82,6 @@ _: {
       # keep-sorted end
     };
 
-    config = mkMerge [
-      (mkIf (cfg.rules.window != []) {
-        programs.hylix._generatedConfig =
-          mkOrder ordering.windowRules
-          (concatStringsSep "\n" (map (buildRule "hl.window_rule") cfg.rules.window));
-      })
-
-      (mkIf (cfg.rules.workspace != []) {
-        programs.hylix._generatedConfig =
-          mkOrder ordering.workspaceRules
-          (concatStringsSep "\n" (map (buildRule "hl.workspace_rule") cfg.rules.workspace));
-      })
-
-      (mkIf (cfg.rules.layer != []) {
-        programs.hylix._generatedConfig =
-          mkOrder ordering.layerRules
-          (concatStringsSep "\n" (map (buildRule "hl.layer_rule") cfg.rules.layer));
-      })
-    ];
+    config = mkMerge (map mkRuleSection ruleSections);
   };
 }

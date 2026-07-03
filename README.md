@@ -1,14 +1,16 @@
 <div align="center">
-  <img src="./assets/nix-logo.png" alt="Nix logo" width="96" />
+  <img src="./assets/nix-logo.png" alt="Nix logo" width="112" />
 
   # hylix
 
   Hyprland configuration framework.
 
+  [![Repo Size](https://img.shields.io/github/repo-size/adam01110/hylix?style=flat-square&label=repo%20size&labelColor=504945&color=3c3836)](https://github.com/adam01110/hylix)
+  <br />
   [![Nix](https://img.shields.io/badge/Nix-flakes-689d6a?style=flat-square&labelColor=504945&logo=nixos&logoColor=ebdbb2)](https://nixos.wiki/wiki/Flakes)
   [![Hyprland](https://img.shields.io/badge/Hyprland-Lua%20config-458588?style=flat-square&labelColor=504945&color=458588)](https://hyprland.org)
 
-  [Overview](#overview) — [Modules](#modules) — [Usage](#usage) — [Development](#development) — [Notes](#notes)
+  [Overview](#overview) - [Usage](#usage) - [Modules](#modules)
 </div>
 
 ## Overview
@@ -17,116 +19,66 @@ Define your Hyprland configuration in Nix. Each domain — settings, keybinds, m
 
 This is a refactored fork of [`karol-broda/nixhypr`](https://github.com/karol-broda/nixhypr)
 
-## Modules
-
-All options live under `programs.hylix.*`.
-
-| Nix option | Lua function | What it configures |
-|---|---|---|
-| `settings` | `hl.config(...)` | Freeform Hyprland settings table |
-| `env` | `hl.env(...)` | Environment variables |
-| `monitors` | `hl.monitor(...)` | Monitor outputs, resolution, position, scale |
-| `animations.curves` | `hl.curve(...)` | Named bezier and spring curves |
-| `animations.animations` | `hl.animation(...)` | Animation definitions |
-| `devices` | `hl.device(...)` | Input device configuration |
-| `permissions` | `hl.permission(...)` | Permission rules (binary, mode, type) |
-| `gestures` | `hl.gesture(...)` | Touch gesture bindings |
-| `binds` / `bindGroups` | `hl.bind(...)` | Keybindings with optional grouping |
-| `rules.window` | `hl.window_rule(...)` | Window matching rules |
-| `rules.workspace` | `hl.workspace_rule(...)` | Workspace rules |
-| `rules.layer` | `hl.layer_rule(...)` | Layer surface rules |
-| `autostart` | `hl.exec_cmd(...)` | Startup commands |
-| `extraLua` / `extraLuaSnippets` | *(raw append)* | Arbitrary Lua code |
-
-The generated output respects a deterministic ordering: settings first, then env, monitors, curves, animations, devices, permissions, gestures, binds, window/workspace/layer rules, autostart, and finally extra Lua snippets.
-
 ## Usage
 
-Add the flake as an input and import either the generic module set or the Home Manager wrapper.
-
-### Via Home Manager
+Add the flake as an input:
 
 ```nix
 {
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    hylix.url = "github:adam01110/hylix";
-  };
+  inputs.hylix.url = "github:adam01110/hylix";
 }
 ```
 
+Then import the Home Manager module and set the pieces you care about:
+
 ```nix
 {
-  imports = [ hylix.homeManagerModules.default ];
+  hylix,
+  ...
+}: {
+  imports = [hylix.homeManagerModules.default];
 
   programs.hylix = {
     enable = true;
 
-    settings = {
-      decoration = {
-        blur = {
-          enabled = true;
-          size = 5;
-        };
-      };
+    settings.general = {
+      gaps_in = 2;
+      gaps_out = 6;
     };
-
-    monitors = [
-      { name = "DP-1"; width = 2560; height = 1440; }
-      { name = "HDMI-A-1"; width = 1920; height = 1080; }
-    ];
 
     binds = [
-      { keys = [ "SUPER" "q" ]; action = "window.close"; }
-      { keys = [ "SUPER" "Return" ]; exec = "foot"; }
-    ];
-
-    autostart = [
-      "waybar"
-      "mako"
+      {
+        keys = ["SUPER" "Return"];
+        exec = "foot";
+      }
     ];
   };
 }
 ```
 
-If Hyprland's own Home Manager module is enabled, the generated Lua is injected into `extraConfig`. Otherwise it is written to `xdg.configFile."hypr/hyprland.lua"`.
+If `wayland.windowManager.hyprland.enable` is already enabled in Home Manager, hylix puts the generated Lua in `wayland.windowManager.hyprland.extraConfig`. Otherwise it writes `~/.config/hypr/hyprland.lua` through `xdg.configFile`.
 
-### Without Home Manager
+For lower-level use, the generic module is exported as `hylix.modules.generic.hylix` and the generated text is exposed at `config.programs.hylix._generatedConfig`.
 
-Use the generic module set directly:
+## Modules
 
-```nix
-{
-  flake.modules.generic.hylix = {
-    programs.hylix.settings = {
-      general = {
-        gaps_in = 2;
-        gaps_out = 4;
-      };
-    };
-  };
-}
-```
+All options live under `programs.hylix.*`.
 
-## Development
-
-From the repository root:
-
-```bash
-# Inspect flake outputs
-nix flake show
-
-# Run CI-equivalent checks
-nix flake check
-
-# Format the repository
-nix fmt
-```
-
-Formatting is wired through `treefmt-nix` using `alejandra`, `deadnix`, `statix`, and `keep-sorted`.
-
-## Notes
-
-- This is a framework, not a standalone configuration. It provides the Nix options and serialisation logic; you provide the values.
-- The Lua output targets Hyprland's Lua config API (`hl.*` functions). Make sure your Hyprland build supports it.
-- `binds` and `bindGroups` both produce the same `hl.bind(...)` output — groups are a convenience for organising related keybinds by category.
+| Option | Lua output | What it configures |
+| --- | --- | --- |
+| `settings` | `hl.config(...)` | Freeform Hyprland settings |
+| `env` | `hl.env(...)` | Environment variables |
+| `monitors` | `hl.monitor(...)` | Outputs, modes, positions, and scale |
+| `devices` | `hl.device(...)` | Input device tables |
+| `animations.curves` | `hl.curve(...)` | Named bezier and spring curves |
+| `animations.animations` | `hl.animation(...)` | Animation rules |
+| `rules.window` | `hl.window_rule(...)` | Window matching rules |
+| `rules.workspace` | `hl.workspace_rule(...)` | Workspace rules |
+| `rules.layer` | `hl.layer_rule(...)` | Layer surface rules |
+| `permissions` | `hl.permission(...)` | Permission prompts and allow/deny rules |
+| `gestures` | `hl.gesture(...)` | Touch gesture bindings |
+| `binds` / `bindGroups` | `hl.bind(...)` | Keybinds, with optional categories |
+| `autostart` | `hl.exec_cmd(...)` | Startup commands |
+| `notifications` | `hl.notification.create(...)` | Startup notifications |
+| `events` | `hl.on(...)` | Hyprland event hooks |
+| `extraLua` / `extraLuaSnippets` | raw append | Anything the module options do not cover |

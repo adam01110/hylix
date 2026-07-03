@@ -8,13 +8,6 @@
     genList
     hasAttr
     head
-    isAttrs
-    isBool
-    isFloat
-    isInt
-    isList
-    isPath
-    isString
     length
     tail
     typeOf
@@ -99,27 +92,25 @@
   indent = depth:
     concatStringsSep "" (genList (_: "  ") depth);
 
-  toLuaValue = depth: value:
-    if value == null
-    then "nil"
-    else if isBool value
-    then boolToString value
-    else if isInt value
-    then toString value
-    else if isFloat value
-    then stripTrailingZeros (toString value)
-    else if isString value
-    then "\"${escapeLuaString value}\""
-    else if isPath value
-    then "\"${escapeLuaString (toString value)}\""
-    else if isList value
-    then toLuaList depth value
-    else if isAttrs value
-    then
-      if hasAttr "__raw" value
-      then value.__raw
-      else toLuaTable depth value
-    else throw "toLua: unsupported type ${typeOf value}";
+  toLuaValue = depth: value: let
+    renderers = {
+      bool = boolToString;
+      float = value: stripTrailingZeros (toString value);
+      int = toString;
+      list = toLuaList depth;
+      null = _: "nil";
+      path = value: "\"${escapeLuaString (toString value)}\"";
+      set = value:
+        if hasAttr "__raw" value
+        then value.__raw
+        else toLuaTable depth value;
+      string = value: "\"${escapeLuaString value}\"";
+    };
+    valueType = typeOf value;
+  in
+    if hasAttr valueType renderers
+    then renderers.${valueType} value
+    else throw "toLua: unsupported type ${valueType}";
 
   toLuaList = depth: xs: let
     inner = indent (depth + 1);

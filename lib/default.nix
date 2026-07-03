@@ -9,6 +9,7 @@ in {
     mkHylixAnimationLineWithCurves
     mkHylixAnimationLines
     mkHylixAnimationLinesWithCurves
+    mkHylixAutostartLine
     mkHylixBind
     mkHylixBindGroup
     mkHylixBindLine
@@ -16,7 +17,15 @@ in {
     mkHylixCurveLine
     mkHylixCurveLines
     mkHylixDispatcher
+    mkHylixEnvLine
+    mkHylixEnvLines
+    mkHylixEventLine
+    mkHylixGeneratedConfig
     mkHylixGroupedBinds
+    mkHylixLines
+    mkHylixLuaCall
+    mkHylixLuaCallLines
+    mkHylixLuaValueCall
     mkHylixMonitorLine
     mkHylixRuleLine
     # keep-sorted end

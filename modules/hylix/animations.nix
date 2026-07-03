@@ -9,10 +9,8 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      mkIf
       mkMerge
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
@@ -20,6 +18,7 @@ _: {
       # keep-sorted start
       mkHylixAnimationLinesWithCurves
       mkHylixCurveLines
+      mkHylixGeneratedConfig
       ordering
       toLua
       # keep-sorted end
@@ -153,13 +152,9 @@ _: {
     };
 
     config = mkMerge [
-      (mkIf (cfg.animations.curves != {}) {
-        programs.hylix._generatedConfig = mkOrder ordering.curves curveLines;
-      })
+      (mkHylixGeneratedConfig (cfg.animations.curves != {}) ordering.curves curveLines)
 
-      (mkIf (cfg.animations.animations != []) {
-        programs.hylix._generatedConfig = mkOrder ordering.animations animLines;
-      })
+      (mkHylixGeneratedConfig (cfg.animations.animations != []) ordering.animations animLines)
     ];
   };
 }

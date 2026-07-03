@@ -9,13 +9,19 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
-    inherit (import ../../lib {inherit lib;}) toLua ordering;
+    inherit
+      (import ../../lib {inherit lib;})
+      # keep-sorted start
+      mkHylixGeneratedConfig
+      mkHylixLines
+      mkHylixLuaValueCall
+      ordering
+      toLua
+      # keep-sorted end
+      ;
     inherit
       (lib.types)
       # keep-sorted start
@@ -51,9 +57,7 @@ _: {
       };
     };
 
-    lines =
-      concatStringsSep "\n"
-      (map (p: "hl.permission(${toLua {inherit (p) binary mode type;}})") cfg.permissions);
+    lines = mkHylixLines (p: mkHylixLuaValueCall toLua "hl.permission" [{inherit (p) binary mode type;}]) cfg.permissions;
   in {
     options.programs.hylix.permissions = mkOption {
       description = "permission rules";
@@ -62,8 +66,6 @@ _: {
       default = [];
     };
 
-    config = mkIf (cfg.permissions != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.permissions lines;
-    };
+    config = mkHylixGeneratedConfig (cfg.permissions != []) ordering.permissions lines;
   };
 }

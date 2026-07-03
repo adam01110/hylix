@@ -9,15 +9,15 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
+      mkHylixEventLine
+      mkHylixGeneratedConfig
+      mkHylixLines
       ordering
       toLua
       # keep-sorted end
@@ -34,17 +34,7 @@ _: {
 
     cfg = config.programs.hylix;
 
-    lines =
-      concatStringsSep "\n"
-      (map (
-          entry:
-            if entry.lua != null
-            then "hl.on(${toLua entry.event}, ${entry.lua})"
-            else if entry.exec != null
-            then "hl.on(${toLua entry.event}, function() hl.dsp.exec_cmd(${toLua entry.exec}) end)"
-            else ""
-        )
-        cfg.events);
+    lines = mkHylixLines (mkHylixEventLine toLua) cfg.events;
   in {
     options.programs.hylix.events = mkOption {
       description = "Hyprland event hooks via hl.on()";
@@ -75,8 +65,6 @@ _: {
       default = [];
     };
 
-    config = mkIf (cfg.events != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.events lines;
-    };
+    config = mkHylixGeneratedConfig (cfg.events != []) ordering.events lines;
   };
 }

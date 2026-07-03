@@ -19,6 +19,7 @@
       settings.global.excludes = [
         # keep-sorted start
         ".direnv/*"
+        ".envrc"
         "flake.nix"
         # keep-sorted end
       ];

@@ -9,15 +9,14 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
     inherit
       (import ../../lib {inherit lib;})
       # keep-sorted start
+      mkHylixGeneratedConfig
+      mkHylixLines
       mkHylixMonitorLine
       ordering
       toLua
@@ -39,7 +38,7 @@ _: {
 
     cfg = config.programs.hylix;
 
-    lines = concatStringsSep "\n" (map (mkHylixMonitorLine toLua) cfg.monitors);
+    lines = mkHylixLines (mkHylixMonitorLine toLua) cfg.monitors;
 
     monitorType = submodule {
       options = {
@@ -88,8 +87,6 @@ _: {
       default = [];
     };
 
-    config = mkIf (cfg.monitors != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.monitors lines;
-    };
+    config = mkHylixGeneratedConfig (cfg.monitors != []) ordering.monitors lines;
   };
 }

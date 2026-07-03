@@ -9,13 +9,18 @@ _: {
     inherit
       (lib)
       # keep-sorted start
-      concatStringsSep
-      mkIf
       mkOption
-      mkOrder
       # keep-sorted end
       ;
-    inherit (import ../../lib {inherit lib;}) toLua ordering;
+    inherit
+      (import ../../lib {inherit lib;})
+      # keep-sorted start
+      mkHylixGeneratedConfig
+      mkHylixLuaCallLines
+      ordering
+      toLua
+      # keep-sorted end
+      ;
     inherit
       (lib.types)
       # keep-sorted start
@@ -26,9 +31,7 @@ _: {
 
     cfg = config.programs.hylix;
 
-    lines =
-      concatStringsSep "\n"
-      (map (g: "hl.gesture(${toLua g})") cfg.gestures);
+    lines = mkHylixLuaCallLines toLua "hl.gesture" cfg.gestures;
   in {
     options.programs.hylix.gestures = mkOption {
       description = "gesture configurations passed to hl.gesture()";
@@ -37,8 +40,6 @@ _: {
       default = [];
     };
 
-    config = mkIf (cfg.gestures != []) {
-      programs.hylix._generatedConfig = mkOrder ordering.gestures lines;
-    };
+    config = mkHylixGeneratedConfig (cfg.gestures != []) ordering.gestures lines;
   };
 }
